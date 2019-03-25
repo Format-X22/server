@@ -1,0 +1,38 @@
+version: '2.1'
+services:
+  direct-mongo:
+    container_name: direct-mongo
+    image: mongo
+    restart: always
+    healthcheck:
+      test: mongo --eval 'db.getCollectionNames()'
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    volumes:
+      - direct-mongodb-vol:/data/db
+    ports:
+      - 127.0.0.1:27017:27017
+    networks:
+      - services-tier
+
+  direct-node:
+    container_name: direct-node
+    restart: always
+    depends_on:
+      - direct-mongo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - services-tier
+    ports:
+      - $GLS_CONNECTOR_HOST:$GLS_CONNECTOR_PORT:$GLS_CONNECTOR_PORT
+    env_file:
+      - .env
+
+volumes:
+  direct-mongodb-vol:
+
+networks:
+  services-tier:
