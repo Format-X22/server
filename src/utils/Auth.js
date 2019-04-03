@@ -1,5 +1,9 @@
 class Auth {
-    static verify() {
+    constructor() {
+        // TODO -
+    }
+
+    verify() {
         // TODO -
     }
 }
