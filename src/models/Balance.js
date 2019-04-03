@@ -8,19 +8,25 @@ module.exports = MongoDB.makeModel(
         accountId: {
             type: String,
         },
-        assetId: {
+        assetTypeId: {
+            type: String,
+        },
+        assetUniqueId: {
             type: String,
         },
         amount: {
             type: MongoBigNum,
+            default: '0',
         },
     },
     {
         index: [
             {
+                // Search
                 fields: {
-                    account: 1,
-                    pointName: 1,
+                    accountId: 1,
+                    assetTypeId: 1,
+                    assetUniqueId: 1,
                 },
             },
         ],
