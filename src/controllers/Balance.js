@@ -12,6 +12,8 @@ class Balance extends Basic {
 
     async send() {
         // TODO -
+
+        // TODO Log to feed.
     }
 }
 
