@@ -1,6 +1,7 @@
 const core = require('gls-core-service');
 const MongoDB = core.services.MongoDB;
 const MongoBigNum = core.types.MongoBigNum;
+const BigNum = core.types.BigNum;
 
 module.exports = MongoDB.makeModel(
     'Balance',
@@ -16,13 +17,19 @@ module.exports = MongoDB.makeModel(
         },
         amount: {
             type: MongoBigNum,
-            default: '0',
+            default: new BigNum('0'),
         },
     },
     {
         index: [
             {
-                // Search
+                // Find for user
+                fields: {
+                    accountId: 1,
+                },
+            },
+            {
+                // Find current
                 fields: {
                     accountId: 1,
                     assetTypeId: 1,

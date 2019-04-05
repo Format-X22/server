@@ -1,6 +1,6 @@
 const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
-const Balance = require('../models/Balance');
+const BalanceModel = require('../models/Balance');
 
 class Admin extends Basic {
     async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
@@ -23,31 +23,28 @@ class Admin extends Basic {
 
     async openExchange() {
         // TODO -
-
         // TODO Log to feed.
     }
 
     async editExchange() {
         // TODO -
-
         // TODO Log to feed.
     }
 
     async closeExchange() {
         // TODO -
-
         // TODO Log to feed.
     }
 
     async _getBalanceModel({ accountId, assetTypeId, assetUniqueId }) {
-        let model = await Balance.findOne({
+        let model = await BalanceModel.findOne({
             accountId,
             assetTypeId,
             assetUniqueId,
         });
 
         if (!model) {
-            model = new Balance({
+            model = new BalanceModel({
                 accountId,
                 assetTypeId,
                 assetUniqueId,

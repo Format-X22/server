@@ -15,6 +15,7 @@ const NUMBER_ID_VALIDATION = {
 const UID_VALIDATION = {
     type: 'string',
     maxLength: 256,
+    default: '',
 };
 const ACCOUNT_VALIDATION = {
     type: 'string',
@@ -43,6 +44,7 @@ class Connector extends BasicConnector {
                     inherits: ['service'],
                     handler: this._balance.get,
                     scope: this._balance,
+                    validation: {},
                 },
                 'balance.getFor': {
                     inherits: ['service'],
@@ -56,14 +58,11 @@ class Connector extends BasicConnector {
                     },
                 },
                 'balance.send': {
-                    inherits: ['service'],
+                    inherits: ['service', 'balanceManipulation'],
                     handler: this._balance.send,
                     scope: this._balance,
                     validation: {
-                        required: ['accountId'],
                         properties: {
-                            accountId: ACCOUNT_VALIDATION,
-                            exchangeId: UID_VALIDATION,
                             message: {
                                 type: 'string',
                                 maxLength: 2048,
@@ -91,6 +90,7 @@ class Connector extends BasicConnector {
                     inherits: ['service', 'sequence'],
                     handler: this._history.get,
                     scope: this._history,
+                    validation: {},
                 },
                 'history.getFor': {
                     inherits: ['service', 'sequence'],
@@ -100,6 +100,7 @@ class Connector extends BasicConnector {
                         required: ['accountId'],
                         properties: {
                             accountId: ACCOUNT_VALIDATION,
+                            assetTypeId: UID_VALIDATION,
                         },
                     },
                 },
@@ -107,6 +108,11 @@ class Connector extends BasicConnector {
                     inherits: ['service', 'sequence'],
                     handler: this._history.getForAll,
                     scope: this._history,
+                    validation: {
+                        properties: {
+                            assetTypeId: UID_VALIDATION,
+                        },
+                    },
                 },
                 'history.getBy': {
                     inherits: ['service'],
@@ -123,11 +129,13 @@ class Connector extends BasicConnector {
                     inherits: ['service', 'balanceManipulation'],
                     handler: this._admin.incrementBalance,
                     scope: this._admin,
+                    validation: {},
                 },
                 'admin.decrementBalance': {
                     inherits: ['service', 'balanceManipulation'],
                     handler: this._admin.decrementBalance,
                     scope: this._admin,
+                    validation: {},
                 },
                 'admin.openExchange': {
                     inherits: ['service'],
@@ -146,6 +154,14 @@ class Connector extends BasicConnector {
                     },
                 },
                 'admin.closeExchange': {
+                    inherits: ['service'],
+                    handler: this._admin.closeExchange,
+                    scope: this._admin,
+                    validation: {
+                        // TODO -
+                    },
+                },
+                'admin.addFeedHook': {
                     inherits: ['service'],
                     handler: this._admin.closeExchange,
                     scope: this._admin,
@@ -173,15 +189,8 @@ class Connector extends BasicConnector {
                                 service: {
                                     type: 'object',
                                     additionalProperties: false,
-                                    required: [
-                                        'version',
-                                        'accountId',
-                                        'sign',
-                                        'identityKey',
-                                        'timestamp',
-                                    ],
+                                    required: ['accountId', 'sign', 'identityKey', 'timestamp'],
                                     properties: {
-                                        version: NUMBER_ID_VALIDATION,
                                         accountId: ACCOUNT_VALIDATION,
                                         identityKey: UID_VALIDATION,
                                         sign: {
@@ -219,15 +228,11 @@ class Connector extends BasicConnector {
                             required: ['accountId', 'assetTypeId', 'amount'],
                             properties: {
                                 accountId: ACCOUNT_VALIDATION,
-                                assetTypeId: {
-                                    type: 'string',
-                                },
-                                assetUniqueId: {
-                                    type: 'string',
-                                    default: '',
-                                },
+                                assetTypeId: UID_VALIDATION,
+                                assetUniqueId: UID_VALIDATION,
                                 amount: {
                                     type: ['string', 'number'],
+                                    maxLength: 128,
                                 },
                             },
                         },
