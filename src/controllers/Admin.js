@@ -21,19 +21,23 @@ class Admin extends Basic {
         // TODO Log to feed.
     }
 
-    async openExchange() {
+    async openExchangeMarket() {
         // TODO -
         // TODO Log to feed.
     }
 
-    async editExchange() {
+    async editExchangeMarket() {
         // TODO -
         // TODO Log to feed.
     }
 
-    async closeExchange() {
+    async closeExchangeMarket() {
         // TODO -
         // TODO Log to feed.
+    }
+
+    async addFeedHook() {
+        // TODO -
     }
 
     async _getBalanceModel({ accountId, assetTypeId, assetUniqueId }) {

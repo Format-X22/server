@@ -6,6 +6,10 @@ class Auth {
     verify() {
         // TODO -
     }
+
+    signResponse() {
+        // TODO -
+    }
 }
 
 module.exports = Auth;

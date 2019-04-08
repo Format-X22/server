@@ -63,6 +63,7 @@ class Connector extends BasicConnector {
                     scope: this._balance,
                     validation: {
                         properties: {
+                            exchangeId: UID_VALIDATION,
                             message: {
                                 type: 'string',
                                 maxLength: 2048,
@@ -71,11 +72,30 @@ class Connector extends BasicConnector {
                     },
                 },
                 'exchange.request': {
-                    inherits: ['service'],
+                    inherits: ['service', 'exchangePair'],
                     handler: this._exchange.request,
                     scope: this._exchange,
                     validation: {
-                        // TODO -
+                        properties: {
+                            what: {
+                                required: ['amount'],
+                                properties: {
+                                    amount: {
+                                        type: ['string', 'number'],
+                                        maxLength: 128,
+                                    },
+                                },
+                            },
+                            for: {
+                                required: ['amount'],
+                                properties: {
+                                    amount: {
+                                        type: ['string', 'number'],
+                                        maxLength: 128,
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
                 'exchange.approve': {
@@ -83,7 +103,16 @@ class Connector extends BasicConnector {
                     handler: this._exchange.approve,
                     scope: this._exchange,
                     validation: {
-                        // TODO -
+                        exchangeId: UID_VALIDATION,
+                    },
+                },
+                'exchange.cancel': {
+                    inherits: ['service'],
+                    handler: this._exchange.cancel,
+                    scope: this._exchange,
+                    required: ['exchangeId'],
+                    validation: {
+                        exchangeId: UID_VALIDATION,
                     },
                 },
                 'history.get': {
@@ -137,36 +166,42 @@ class Connector extends BasicConnector {
                     scope: this._admin,
                     validation: {},
                 },
-                'admin.openExchange': {
-                    inherits: ['service'],
-                    handler: this._admin.openExchange,
+                'admin.openExchangeMarket': {
+                    inherits: ['service', 'exchangePair', 'exchangeMarketProperties'],
+                    handler: this._admin.openExchangeMarket,
+                    scope: this._admin,
+                    validation: {},
+                },
+                'admin.editExchangeMarket': {
+                    inherits: ['service', 'exchangeMarketProperties'],
+                    handler: this._admin.editExchangeMarket,
                     scope: this._admin,
                     validation: {
-                        // TODO -
+                        exchangeMarketId: UID_VALIDATION,
                     },
                 },
-                'admin.editExchange': {
+                'admin.closeExchangeMarket': {
                     inherits: ['service'],
-                    handler: this._admin.editExchange,
+                    handler: this._admin.closeExchangeMarket,
                     scope: this._admin,
+                    required: ['exchangeMarketId'],
                     validation: {
-                        // TODO -
-                    },
-                },
-                'admin.closeExchange': {
-                    inherits: ['service'],
-                    handler: this._admin.closeExchange,
-                    scope: this._admin,
-                    validation: {
-                        // TODO -
+                        exchangeMarketId: UID_VALIDATION,
                     },
                 },
                 'admin.addFeedHook': {
                     inherits: ['service'],
-                    handler: this._admin.closeExchange,
+                    handler: this._admin.addFeedHook,
                     scope: this._admin,
                     validation: {
-                        // TODO -
+                        required: ['url'],
+                        properties: {
+                            url: {
+                                type: 'string',
+                                maxLength: 2048,
+                            },
+                            assetTypeId: UID_VALIDATION,
+                        },
                     },
                 },
             },
@@ -181,6 +216,12 @@ class Connector extends BasicConnector {
                             {
                                 handler: this._identity.verify,
                                 scope: this._identity,
+                            },
+                        ],
+                        after: [
+                            {
+                                handler: this._auth.signResponse,
+                                scope: this._auth,
                             },
                         ],
                         validation: {
@@ -233,6 +274,54 @@ class Connector extends BasicConnector {
                                 amount: {
                                     type: ['string', 'number'],
                                     maxLength: 128,
+                                },
+                            },
+                        },
+                    },
+                    exchangePair: {
+                        validation: {
+                            properties: {
+                                what: {
+                                    type: 'object',
+                                    additionalProperties: false,
+                                    required: ['assetTypeId'],
+                                    properties: {
+                                        assetTypeId: UID_VALIDATION,
+                                        assetUniqueId: UID_VALIDATION,
+                                    },
+                                },
+                                for: {
+                                    type: 'object',
+                                    additionalProperties: false,
+                                    required: ['assetTypeId'],
+                                    properties: {
+                                        assetTypeId: UID_VALIDATION,
+                                        assetUniqueId: UID_VALIDATION,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    exchangeMarketProperties: {
+                        validation: {
+                            what: {
+                                type: 'object',
+                                additionalProperties: false,
+                                properties: {
+                                    maxTotalAmount: {
+                                        type: ['string', 'number'],
+                                        maxLength: 128,
+                                    },
+                                },
+                            },
+                            for: {
+                                type: 'object',
+                                additionalProperties: false,
+                                properties: {
+                                    maxTotalAmount: {
+                                        type: ['string', 'number'],
+                                        maxLength: 128,
+                                    },
                                 },
                             },
                         },

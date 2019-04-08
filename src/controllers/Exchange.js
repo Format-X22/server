@@ -11,6 +11,11 @@ class Exchange extends Basic {
         // TODO -
         // TODO Log to feed.
     }
+
+    async cancel() {
+        // TODO -
+        // TODO Log to feed.
+    }
 }
 
 module.exports = Exchange;
