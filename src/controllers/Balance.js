@@ -24,6 +24,7 @@ class Balance extends Basic {
         };
     }
 
+    // TODO Return transactionId
     async send({
         service: { accountId },
         accountId: targetAccountId,

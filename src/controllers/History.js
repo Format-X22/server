@@ -2,19 +2,19 @@ const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
 
 class History extends Basic {
-    async get() {
+    async get({ sequenceKey, limit }) {
         // TODO -
     }
 
-    async getFor() {
+    async getFor({ accountId, assetTypeId, sequenceKey, limit }) {
         // TODO -
     }
 
-    async getForAll() {
+    async getForAll({ assetTypeId, sequenceKey, limit }) {
         // TODO -
     }
 
-    async getBy() {
+    async getBy({ transactionId }) {
         // TODO -
     }
 }

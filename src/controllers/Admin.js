@@ -21,22 +21,33 @@ class Admin extends Basic {
         // TODO Log to feed.
     }
 
-    async openExchangeMarket() {
+    async openExchangeMarket({
+        what: { assetTypeId, assetUniqueId, maxTotalAmount },
+        forWhat: {
+            assetTypeId: targetAssetTypeId,
+            assetUniqueId: targetAssetUniqueId,
+            maxTotalAmount: targetMaxTotalAmount,
+        },
+    }) {
         // TODO -
         // TODO Log to feed.
     }
 
-    async editExchangeMarket() {
+    async editExchangeMarket({
+        exchangeMarketId,
+        what: { maxTotalAmount },
+        forWhat: { maxTotalAmount: targetMaxTotalAmount },
+    }) {
         // TODO -
         // TODO Log to feed.
     }
 
-    async closeExchangeMarket() {
+    async closeExchangeMarket({ exchangeMarketId }) {
         // TODO -
         // TODO Log to feed.
     }
 
-    async addFeedHook() {
+    async addFeedHook({ url, assetTypeId }) {
         // TODO -
     }
 

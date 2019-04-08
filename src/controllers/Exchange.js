@@ -2,17 +2,24 @@ const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
 
 class Exchange extends Basic {
-    async request() {
+    async request({
+        what: { assetTypeId, assetUniqueId, amount },
+        forWhat: {
+            assetTypeId: targetAssetTypeId,
+            assetUniqueId: targetAssetUniqueId,
+            amount: targetAmount,
+        },
+    }) {
         // TODO -
         // TODO Log to feed.
     }
 
-    async approve() {
+    async approve({ exchangeId }) {
         // TODO -
         // TODO Log to feed.
     }
 
-    async cancel() {
+    async cancel({ exchangeId }) {
         // TODO -
         // TODO Log to feed.
     }

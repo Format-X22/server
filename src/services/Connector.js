@@ -86,7 +86,7 @@ class Connector extends BasicConnector {
                                     },
                                 },
                             },
-                            for: {
+                            forWhat: {
                                 required: ['amount'],
                                 properties: {
                                     amount: {
@@ -290,7 +290,7 @@ class Connector extends BasicConnector {
                                         assetUniqueId: UID_VALIDATION,
                                     },
                                 },
-                                for: {
+                                forWhat: {
                                     type: 'object',
                                     additionalProperties: false,
                                     required: ['assetTypeId'],
@@ -314,7 +314,7 @@ class Connector extends BasicConnector {
                                     },
                                 },
                             },
-                            for: {
+                            forWhat: {
                                 type: 'object',
                                 additionalProperties: false,
                                 properties: {
