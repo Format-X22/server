@@ -7,21 +7,6 @@ const Exchange = require('../controllers/Exchange');
 const History = require('../controllers/History');
 const Auth = require('../utils/Auth');
 
-// TODO Core validation types
-const NUMBER_ID_VALIDATION = {
-    type: 'number',
-    minValue: 0,
-};
-const UID_VALIDATION = {
-    type: 'string',
-    maxLength: 256,
-    default: '',
-};
-const ACCOUNT_VALIDATION = {
-    type: 'string',
-    pattern: '^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$',
-};
-
 class Connector extends BasicConnector {
     constructor({ identityService }) {
         super();
@@ -34,7 +19,7 @@ class Connector extends BasicConnector {
         this._history = new History(linking);
 
         this._identity = identityService;
-        this._auth = new Auth(); // TODO Keys
+        this._auth = new Auth();
     }
 
     async start() {
@@ -53,7 +38,9 @@ class Connector extends BasicConnector {
                     validation: {
                         required: ['accountId'],
                         properties: {
-                            accountId: ACCOUNT_VALIDATION,
+                            accountId: {
+                                type: 'accountId',
+                            },
                         },
                     },
                 },
@@ -63,7 +50,9 @@ class Connector extends BasicConnector {
                     scope: this._balance,
                     validation: {
                         properties: {
-                            exchangeId: UID_VALIDATION,
+                            exchangeId: {
+                                type: 'uid',
+                            },
                             message: {
                                 type: 'string',
                                 maxLength: 2048,
@@ -103,7 +92,9 @@ class Connector extends BasicConnector {
                     handler: this._exchange.approve,
                     scope: this._exchange,
                     validation: {
-                        exchangeId: UID_VALIDATION,
+                        exchangeId: {
+                            type: 'uid',
+                        },
                     },
                 },
                 'exchange.cancel': {
@@ -112,7 +103,9 @@ class Connector extends BasicConnector {
                     scope: this._exchange,
                     required: ['exchangeId'],
                     validation: {
-                        exchangeId: UID_VALIDATION,
+                        exchangeId: {
+                            type: 'uid',
+                        },
                     },
                 },
                 'history.get': {
@@ -128,8 +121,12 @@ class Connector extends BasicConnector {
                     validation: {
                         required: ['accountId'],
                         properties: {
-                            accountId: ACCOUNT_VALIDATION,
-                            assetTypeId: UID_VALIDATION,
+                            accountId: {
+                                type: 'accountId',
+                            },
+                            assetTypeId: {
+                                type: 'uid',
+                            },
                         },
                     },
                 },
@@ -139,7 +136,9 @@ class Connector extends BasicConnector {
                     scope: this._history,
                     validation: {
                         properties: {
-                            assetTypeId: UID_VALIDATION,
+                            assetTypeId: {
+                                type: 'uid',
+                            },
                         },
                     },
                 },
@@ -150,7 +149,9 @@ class Connector extends BasicConnector {
                     validation: {
                         required: ['transactionId'],
                         properties: {
-                            transactionId: NUMBER_ID_VALIDATION,
+                            transactionId: {
+                                type: 'numberId',
+                            },
                         },
                     },
                 },
@@ -177,7 +178,9 @@ class Connector extends BasicConnector {
                     handler: this._admin.editExchangeMarket,
                     scope: this._admin,
                     validation: {
-                        exchangeMarketId: UID_VALIDATION,
+                        exchangeMarketId: {
+                            type: 'uid',
+                        },
                     },
                 },
                 'admin.closeExchangeMarket': {
@@ -186,7 +189,9 @@ class Connector extends BasicConnector {
                     scope: this._admin,
                     required: ['exchangeMarketId'],
                     validation: {
-                        exchangeMarketId: UID_VALIDATION,
+                        exchangeMarketId: {
+                            type: 'uid',
+                        },
                     },
                 },
                 'admin.addFeedHook': {
@@ -200,7 +205,9 @@ class Connector extends BasicConnector {
                                 type: 'string',
                                 maxLength: 2048,
                             },
-                            assetTypeId: UID_VALIDATION,
+                            assetTypeId: {
+                                type: 'uid',
+                            },
                         },
                     },
                 },
@@ -230,10 +237,24 @@ class Connector extends BasicConnector {
                                 service: {
                                     type: 'object',
                                     additionalProperties: false,
-                                    required: ['accountId', 'sign', 'identityKey', 'timestamp'],
+                                    required: [
+                                        'accountId',
+                                        'publicKey',
+                                        'sign',
+                                        'identityKey',
+                                        'timestamp',
+                                    ],
                                     properties: {
-                                        accountId: ACCOUNT_VALIDATION,
-                                        identityKey: UID_VALIDATION,
+                                        accountId: {
+                                            type: 'accountId',
+                                        },
+                                        publicKey: {
+                                            type: 'string',
+                                            maxLength: 1024,
+                                        },
+                                        identityKey: {
+                                            type: 'uid',
+                                        },
                                         sign: {
                                             type: 'string',
                                             maxLength: 1024,
@@ -268,9 +289,15 @@ class Connector extends BasicConnector {
                         validation: {
                             required: ['accountId', 'assetTypeId', 'amount'],
                             properties: {
-                                accountId: ACCOUNT_VALIDATION,
-                                assetTypeId: UID_VALIDATION,
-                                assetUniqueId: UID_VALIDATION,
+                                accountId: {
+                                    type: 'accountId',
+                                },
+                                assetTypeId: {
+                                    type: 'uid',
+                                },
+                                assetUniqueId: {
+                                    type: 'uid',
+                                },
                                 amount: {
                                     type: ['string', 'number'],
                                     maxLength: 128,
@@ -286,8 +313,12 @@ class Connector extends BasicConnector {
                                     additionalProperties: false,
                                     required: ['assetTypeId'],
                                     properties: {
-                                        assetTypeId: UID_VALIDATION,
-                                        assetUniqueId: UID_VALIDATION,
+                                        assetTypeId: {
+                                            type: 'uid',
+                                        },
+                                        assetUniqueId: {
+                                            type: 'uid',
+                                        },
                                     },
                                 },
                                 forWhat: {
@@ -295,8 +326,12 @@ class Connector extends BasicConnector {
                                     additionalProperties: false,
                                     required: ['assetTypeId'],
                                     properties: {
-                                        assetTypeId: UID_VALIDATION,
-                                        assetUniqueId: UID_VALIDATION,
+                                        assetTypeId: {
+                                            type: 'uid',
+                                        },
+                                        assetUniqueId: {
+                                            type: 'uid',
+                                        },
                                     },
                                 },
                             },
@@ -325,6 +360,21 @@ class Connector extends BasicConnector {
                                 },
                             },
                         },
+                    },
+                },
+                validationTypes: {
+                    numberId: {
+                        type: 'number',
+                        minValue: 0,
+                    },
+                    uid: {
+                        type: 'string',
+                        maxLength: 256,
+                        default: '',
+                    },
+                    accountId: {
+                        type: 'string',
+                        pattern: '^ID[0-9a-f]{64}$',
                     },
                 },
             },
