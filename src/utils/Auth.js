@@ -12,6 +12,10 @@ class Auth {
     signResponse() {
         // TODO -
     }
+
+    checkAdminAccess() {
+        // TODO -
+    }
 }
 
 module.exports = Auth;

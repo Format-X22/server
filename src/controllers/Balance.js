@@ -36,6 +36,9 @@ class Balance extends Basic {
     }) {
         amount = new BigNum(amount);
 
+        // TODO Check asset freeze
+        // TODO Check account freeze
+
         this._checkTarget(accountId, targetAccountId);
         this._checkSendAmount(amount);
         await this._checkTransferable(assetTypeId);
@@ -95,6 +98,58 @@ class Balance extends Basic {
         await modelTo.save();
 
         // TODO Log to feed.
+    }
+
+    async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
+        // TODO Check assetType
+
+        const model = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
+
+        model.amount = model.amount.plus(amount);
+        await model.save();
+
+        // TODO Change max supply
+        // TODO Log to feed.
+    }
+
+    async decrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
+        // TODO Check assetType
+
+        const model = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
+
+        model.amount = model.amount.minus(amount);
+        await model.save();
+
+        // TODO Change max supply
+        // TODO Log to feed.
+    }
+
+    async freezeAccount({ accountId }) {
+        // TODO -
+        // TODO Log to feed.
+    }
+
+    async unfreezeAccount({ accountId }) {
+        // TODO -
+        // TODO Log to feed.
+    }
+
+    async _getBalanceModel({ accountId, assetTypeId, assetUniqueId }) {
+        let model = await BalanceModel.findOne({
+            accountId,
+            assetTypeId,
+            assetUniqueId,
+        });
+
+        if (!model) {
+            model = new BalanceModel({
+                accountId,
+                assetTypeId,
+                assetUniqueId,
+            });
+        }
+
+        return model;
     }
 }
 

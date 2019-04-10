@@ -17,6 +17,14 @@ class History extends Basic {
     async getBy({ transactionId }) {
         // TODO -
     }
+
+    async addHook({ url, assetTypeId }) {
+        // TODO -
+    }
+
+    async removeHook({ hookId }) {
+        // TODO -
+    }
 }
 
 module.exports = History;

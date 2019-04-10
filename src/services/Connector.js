@@ -1,10 +1,10 @@
 const core = require('gls-core-service');
 const BasicConnector = core.services.Connector;
 const env = require('../data/env');
-const Admin = require('../controllers/Admin');
 const Balance = require('../controllers/Balance');
 const Exchange = require('../controllers/Exchange');
 const History = require('../controllers/History');
+const Asset = require('../controllers/Asset');
 const Auth = require('../utils/Auth');
 
 class Connector extends BasicConnector {
@@ -13,10 +13,10 @@ class Connector extends BasicConnector {
 
         const linking = { connector: this };
 
-        this._admin = new Admin(linking);
         this._balance = new Balance(linking);
         this._exchange = new Exchange(linking);
         this._history = new History(linking);
+        this._asset = new Asset(linking);
 
         this._identity = identityService;
         this._auth = new Auth();
@@ -25,6 +25,97 @@ class Connector extends BasicConnector {
     async start() {
         await super.start({
             serverRoutes: {
+                /**
+                 * ===== ASSET API SECTION =====
+                 **/
+                'asset.getList': {
+                    inherits: ['service'],
+                    handler: this._asset.getList,
+                    scope: this._asset,
+                    validation: {},
+                },
+                'admin.asset.createAsset': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._asset.createAsset,
+                    scope: this._asset,
+                    validation: {
+                        required: ['shortName', 'fullName', 'maxSupply'],
+                        properties: {
+                            shortName: {
+                                type: 'string',
+                                minLength: 1,
+                                maxLength: 16,
+                            },
+                            fullName: {
+                                type: 'string',
+                                minLength: 1,
+                                maxLength: 256,
+                            },
+                            maxSupply: {
+                                type: ['number', 'string'],
+                            },
+                            logo: {
+                                type: 'string',
+                                maxLength: 65536,
+                            },
+                            unique: {
+                                type: 'boolean',
+                                default: false,
+                            },
+                            transferable: {
+                                type: 'boolean',
+                                default: true,
+                            },
+                            frozen: {
+                                type: 'boolean',
+                                default: false,
+                            },
+                        },
+                    },
+                },
+                'admin.asset.destroyAsset': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._asset.destroyAsset,
+                    scope: this._asset,
+                    validation: {
+                        required: ['assetTypeId'],
+                        properties: {
+                            assetTypeId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
+                'admin.asset.freezeAsset': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._asset.freezeAsset,
+                    scope: this._asset,
+                    validation: {
+                        required: ['assetTypeId'],
+                        properties: {
+                            assetTypeId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
+                'admin.asset.unfreezeAsset': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._asset.unfreezeAsset,
+                    scope: this._asset,
+                    validation: {
+                        required: ['assetTypeId'],
+                        properties: {
+                            assetTypeId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
+
+                /**
+                 * ===== BALANCE API SECTION =====
+                 **/
                 'balance.get': {
                     inherits: ['service'],
                     handler: this._balance.get,
@@ -60,6 +151,48 @@ class Connector extends BasicConnector {
                         },
                     },
                 },
+                'admin.balance.incrementBalance': {
+                    inherits: ['adminOnly', 'service', 'balanceManipulation'],
+                    handler: this._balance.incrementBalance,
+                    scope: this._balance,
+                    validation: {},
+                },
+                'admin.balance.decrementBalance': {
+                    inherits: ['adminOnly', 'service', 'balanceManipulation'],
+                    handler: this._balance.decrementBalance,
+                    scope: this._balance,
+                    validation: {},
+                },
+                'admin.balance.freezeAccount': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._balance.freezeAccount,
+                    scope: this._balance,
+                    validation: {
+                        required: ['accountId'],
+                        properties: {
+                            accountId: {
+                                type: 'accountId',
+                            },
+                        },
+                    },
+                },
+                'admin.balance.unfreezeAccount': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._balance.unfreezeAccount,
+                    scope: this._balance,
+                    validation: {
+                        required: ['accountId'],
+                        properties: {
+                            accountId: {
+                                type: 'accountId',
+                            },
+                        },
+                    },
+                },
+
+                /**
+                 * ===== EXCHANGE API SECTION =====
+                 **/
                 'exchange.request': {
                     inherits: ['service', 'exchangePair'],
                     handler: this._exchange.request,
@@ -87,13 +220,29 @@ class Connector extends BasicConnector {
                         },
                     },
                 },
+                'exchange.take': {
+                    inherits: ['service'],
+                    handler: this._exchange.take,
+                    scope: this._exchange,
+                    validation: {
+                        required: ['exchangeId'],
+                        properties: {
+                            exchangeId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
                 'exchange.approve': {
                     inherits: ['service'],
                     handler: this._exchange.approve,
                     scope: this._exchange,
                     validation: {
-                        exchangeId: {
-                            type: 'uid',
+                        required: ['exchangeId'],
+                        properties: {
+                            exchangeId: {
+                                type: 'uid',
+                            },
                         },
                     },
                 },
@@ -101,13 +250,69 @@ class Connector extends BasicConnector {
                     inherits: ['service'],
                     handler: this._exchange.cancel,
                     scope: this._exchange,
-                    required: ['exchangeId'],
                     validation: {
-                        exchangeId: {
-                            type: 'uid',
+                        required: ['exchangeId'],
+                        properties: {
+                            exchangeId: {
+                                type: 'uid',
+                            },
                         },
                     },
                 },
+                'exchange.getAssetTypes': {
+                    inherits: ['service'],
+                    handler: this._exchange.getAssetTypes,
+                    scope: this._exchange,
+                    validation: {},
+                },
+                'exchange.getRequests': {
+                    inherits: ['service', 'sequence'],
+                    handler: this._exchange.getRequests,
+                    scope: this._exchange,
+                    validation: {
+                        required: ['assetTypeId'],
+                        properties: {
+                            assetTypeId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
+                'admin.exchange.openExchangeMarket': {
+                    inherits: ['adminOnly', 'service', 'exchangePair', 'exchangeMarketProperties'],
+                    handler: this._exchange.openExchangeMarket,
+                    scope: this._exchange,
+                    validation: {},
+                },
+                'admin.exchange.editExchangeMarket': {
+                    inherits: ['adminOnly', 'service', 'exchangeMarketProperties'],
+                    handler: this._exchange.editExchangeMarket,
+                    scope: this._exchange,
+                    validation: {
+                        properties: {
+                            exchangeMarketId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
+                'admin.exchange.closeExchangeMarket': {
+                    inherits: ['adminOnly', 'service'],
+                    handler: this._exchange.closeExchangeMarket,
+                    scope: this._exchange,
+                    validation: {
+                        required: ['exchangeMarketId'],
+                        properties: {
+                            exchangeMarketId: {
+                                type: 'uid',
+                            },
+                        },
+                    },
+                },
+
+                /**
+                 * ===== HISTORY API SECTION =====
+                 **/
                 'history.get': {
                     inherits: ['service', 'sequence'],
                     handler: this._history.get,
@@ -155,49 +360,10 @@ class Connector extends BasicConnector {
                         },
                     },
                 },
-                'admin.incrementBalance': {
-                    inherits: ['service', 'balanceManipulation'],
-                    handler: this._admin.incrementBalance,
-                    scope: this._admin,
-                    validation: {},
-                },
-                'admin.decrementBalance': {
-                    inherits: ['service', 'balanceManipulation'],
-                    handler: this._admin.decrementBalance,
-                    scope: this._admin,
-                    validation: {},
-                },
-                'admin.openExchangeMarket': {
-                    inherits: ['service', 'exchangePair', 'exchangeMarketProperties'],
-                    handler: this._admin.openExchangeMarket,
-                    scope: this._admin,
-                    validation: {},
-                },
-                'admin.editExchangeMarket': {
-                    inherits: ['service', 'exchangeMarketProperties'],
-                    handler: this._admin.editExchangeMarket,
-                    scope: this._admin,
-                    validation: {
-                        exchangeMarketId: {
-                            type: 'uid',
-                        },
-                    },
-                },
-                'admin.closeExchangeMarket': {
+                'admin.history.addHook': {
                     inherits: ['service'],
-                    handler: this._admin.closeExchangeMarket,
-                    scope: this._admin,
-                    required: ['exchangeMarketId'],
-                    validation: {
-                        exchangeMarketId: {
-                            type: 'uid',
-                        },
-                    },
-                },
-                'admin.addFeedHook': {
-                    inherits: ['service'],
-                    handler: this._admin.addFeedHook,
-                    scope: this._admin,
+                    handler: this._history.addHook,
+                    scope: this._history,
                     validation: {
                         required: ['url'],
                         properties: {
@@ -211,9 +377,30 @@ class Connector extends BasicConnector {
                         },
                     },
                 },
+                'admin.history.removeHook': {
+                    inherits: ['service'],
+                    handler: this._history.removeHook,
+                    scope: this._history,
+                    validation: {
+                        required: ['url'],
+                        properties: {
+                            hookId: {
+                                type: 'numberId',
+                            },
+                        },
+                    },
+                },
             },
             serverDefaults: {
                 parents: {
+                    adminOnly: {
+                        before: [
+                            {
+                                handler: this._auth.checkAdminAccess,
+                                scope: this._auth,
+                            },
+                        ],
+                    },
                     service: {
                         before: [
                             {
@@ -374,7 +561,7 @@ class Connector extends BasicConnector {
                     },
                     accountId: {
                         type: 'string',
-                        pattern: '^ID[0-9a-f]{64}$',
+                        pattern: '^ID[0-9a-fA-F]{64}$',
                     },
                 },
             },
