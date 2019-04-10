@@ -425,16 +425,12 @@ class Connector extends BasicConnector {
                                     type: 'object',
                                     additionalProperties: false,
                                     required: [
-                                        'accountId',
                                         'publicKey',
                                         'sign',
                                         'identityKey',
                                         'timestamp',
                                     ],
                                     properties: {
-                                        accountId: {
-                                            type: 'accountId',
-                                        },
                                         publicKey: {
                                             type: 'string',
                                             maxLength: 1024,

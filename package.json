@@ -1,6 +1,6 @@
 {
   "name": "direct-server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "./src/index.js",
   "scripts": {
@@ -27,6 +27,7 @@
     ]
   },
   "dependencies": {
-    "gls-core-service": "^3.17.7"
+    "gls-core-service": "^3.17.8",
+    "uuid": "^3.3.2"
   }
 }

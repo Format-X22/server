@@ -2,4 +2,7 @@ const env = process.env;
 
 module.exports = {
     DS_MAX_HISTORY_LIMIT: Number(env.DS_MAX_HISTORY_LIMIT) || 100,
+    DS_ADMIN_ACCOUNT_ID: env.DS_ADMIN_ACCOUNT_ID,
+    DS_ADMIN_PUBLIC_KEY: env.DS_ADMIN_PUBLIC_KEY,
+    DS_ADMIN_PRIVATE_KEY: env.DS_ADMIN_PRIVATE_KEY,
 };
