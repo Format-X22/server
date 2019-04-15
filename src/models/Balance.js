@@ -1,7 +1,5 @@
 const core = require('gls-core-service');
 const MongoDB = core.services.MongoDB;
-const MongoBigNum = core.types.MongoBigNum;
-const BigNum = core.types.BigNum;
 
 module.exports = MongoDB.makeModel(
     'Balance',
@@ -16,8 +14,8 @@ module.exports = MongoDB.makeModel(
             type: String,
         },
         amount: {
-            type: MongoBigNum,
-            default: new BigNum('0'),
+            type: Number,
+            default: 0,
         },
     },
     {

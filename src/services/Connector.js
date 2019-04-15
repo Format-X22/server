@@ -140,11 +140,11 @@ class Connector extends BasicConnector {
                             maxLength: 2000,
                         },
                         decimals: {
-                            type: 'number',
+                            type: 'integer',
                             default: 0,
                         },
                         maxSupply: {
-                            type: 'number',
+                            type: 'integer',
                             default: 0,
                         },
                         logo: {
@@ -504,7 +504,7 @@ class Connector extends BasicConnector {
                                     maxLength: 1024,
                                 },
                                 timestamp: {
-                                    type: 'number',
+                                    type: 'integer',
                                     minValue: 1553000000000,
                                 },
                             },
@@ -521,7 +521,7 @@ class Connector extends BasicConnector {
                             maxLength: 256,
                         },
                         limit: {
-                            type: 'number',
+                            type: 'integer',
                             default: 10,
                             minValue: 1,
                             maxValue: env.DS_MAX_HISTORY_LIMIT,
@@ -543,8 +543,8 @@ class Connector extends BasicConnector {
                             type: 'uid',
                         },
                         amount: {
-                            type: ['string', 'number'],
-                            maxLength: 128,
+                            type: 'integer',
+                            minValue: 1,
                         },
                     },
                 },
@@ -588,7 +588,7 @@ class Connector extends BasicConnector {
     _getCustomValidationTypes() {
         return {
             numberId: {
-                type: 'number',
+                type: 'integer',
                 minValue: 0,
             },
             uid: {
