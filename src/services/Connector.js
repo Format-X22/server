@@ -48,18 +48,32 @@ class Connector extends BasicConnector {
                 scope: this._node,
                 validation: {},
             },
-            'node.getKnownNodes': {
-                inherits: ['service'],
-                handler: this._node.getKnownNodes,
-                scope: this._node,
-                validation: {},
-            },
             'admin.node.setInfo': {
                 inherits: ['adminOnly', 'service'],
                 handler: this._node.setInfo,
                 scope: this._node,
                 validation: {
-                    // TODO -
+                    properties: {
+                        name: {
+                            type: 'string',
+                            maxLength: 128,
+                        },
+                        description: {
+                            type: 'string',
+                            maxLength: 2000,
+                        },
+                        links: {
+                            type: 'array',
+                            items: {
+                                type: 'string',
+                                maxLength: 2048,
+                            },
+                        },
+                        logo: {
+                            type: 'string',
+                            maxLength: 1048576,
+                        },
+                    },
                 },
             },
             'admin.node.setKnownNodes': {
@@ -67,7 +81,15 @@ class Connector extends BasicConnector {
                 handler: this._node.setKnownNodes,
                 scope: this._node,
                 validation: {
-                    // TODO -
+                    required: ['knownNodes'],
+                    properties: {
+                        knownNodes: {
+                            type: 'array',
+                            items: {
+                                type: 'string',
+                            },
+                        },
+                    },
                 },
             },
             'admin.node.removeKnownNodes': {
@@ -75,7 +97,15 @@ class Connector extends BasicConnector {
                 handler: this._node.removeKnownNodes,
                 scope: this._node,
                 validation: {
-                    // TODO -
+                    required: ['knownNodes'],
+                    properties: {
+                        knownNodes: {
+                            type: 'array',
+                            items: {
+                                type: 'string',
+                            },
+                        },
+                    },
                 },
             },
         };
@@ -111,7 +141,7 @@ class Connector extends BasicConnector {
                         },
                         logo: {
                             type: 'string',
-                            maxLength: 65536,
+                            maxLength: 1048576,
                         },
                         unique: {
                             type: 'boolean',
@@ -409,7 +439,6 @@ class Connector extends BasicConnector {
                 handler: this._history.removeHook,
                 scope: this._history,
                 validation: {
-                    required: ['url'],
                     properties: {
                         hookId: {
                             type: 'numberId',
