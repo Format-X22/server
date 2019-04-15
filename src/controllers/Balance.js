@@ -52,6 +52,40 @@ class Balance extends Basic {
         );
     }
 
+    async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
+        // TODO Check assetType
+
+        const model = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
+
+        model.amount = model.amount.plus(amount);
+        await model.save();
+
+        // TODO Change max supply
+        // TODO Log to feed.
+    }
+
+    async decrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
+        // TODO Check assetType
+
+        const model = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
+
+        model.amount = model.amount.minus(amount);
+        await model.save();
+
+        // TODO Change max supply
+        // TODO Log to feed.
+    }
+
+    async freezeAccount({ accountId }) {
+        // TODO -
+        // TODO Log to feed.
+    }
+
+    async unfreezeAccount({ accountId }) {
+        // TODO -
+        // TODO Log to feed.
+    }
+
     _checkTarget(accountId, targetAccountId) {
         if (accountId === targetAccountId) {
             throw { code: 400, message: 'accountId == targetAccountId' };
@@ -97,40 +131,6 @@ class Balance extends Basic {
 
         await modelTo.save();
 
-        // TODO Log to feed.
-    }
-
-    async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
-        // TODO Check assetType
-
-        const model = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
-
-        model.amount = model.amount.plus(amount);
-        await model.save();
-
-        // TODO Change max supply
-        // TODO Log to feed.
-    }
-
-    async decrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
-        // TODO Check assetType
-
-        const model = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
-
-        model.amount = model.amount.minus(amount);
-        await model.save();
-
-        // TODO Change max supply
-        // TODO Log to feed.
-    }
-
-    async freezeAccount({ accountId }) {
-        // TODO -
-        // TODO Log to feed.
-    }
-
-    async unfreezeAccount({ accountId }) {
-        // TODO -
         // TODO Log to feed.
     }
 

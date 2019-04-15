@@ -35,39 +35,8 @@ class Exchange extends Basic {
         // TODO Log to feed.
     }
 
-    async getAssetTypes({}) {
-        // TODO -
-    }
-
     async getRequests({ assetTypeId, limit, sequenceKey }) {
         // TODO -
-    }
-
-    async openExchangeMarket({
-        what: { assetTypeId, assetUniqueId, maxTotalAmount },
-        forWhat: {
-            assetTypeId: targetAssetTypeId,
-            assetUniqueId: targetAssetUniqueId,
-            maxTotalAmount: targetMaxTotalAmount,
-        },
-    }) {
-        // TODO Check assetType
-        // TODO -
-        // TODO Log to feed.
-    }
-
-    async editExchangeMarket({
-        exchangeMarketId,
-        what: { maxTotalAmount },
-        forWhat: { maxTotalAmount: targetMaxTotalAmount },
-    }) {
-        // TODO -
-        // TODO Log to feed.
-    }
-
-    async closeExchangeMarket({ exchangeMarketId }) {
-        // TODO -
-        // TODO Log to feed.
     }
 }
 
