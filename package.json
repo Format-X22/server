@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "gls-core-service": "^3.17.8",
+    "gls-core-service": "^3.18.0",
     "uuid": "^3.3.2"
   }
 }
