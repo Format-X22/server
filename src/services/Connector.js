@@ -536,7 +536,6 @@ class Connector extends BasicConnector {
             uid: {
                 type: 'string',
                 maxLength: 256,
-                default: '',
             },
             accountId: {
                 type: 'string',
