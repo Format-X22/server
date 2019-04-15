@@ -5,6 +5,7 @@ const Balance = require('../controllers/Balance');
 const Exchange = require('../controllers/Exchange');
 const History = require('../controllers/History');
 const Asset = require('../controllers/Asset');
+const Node = require('../controllers/Node');
 const Auth = require('../utils/Auth');
 
 class Connector extends BasicConnector {
@@ -17,6 +18,7 @@ class Connector extends BasicConnector {
         this._exchange = new Exchange(linking);
         this._history = new History(linking);
         this._asset = new Asset(linking);
+        this._node = new Node(linking);
 
         this._identity = identityService;
         this._auth = new Auth();
@@ -25,6 +27,7 @@ class Connector extends BasicConnector {
     async start() {
         await super.start({
             serverRoutes: {
+                ...this._getNodeApiConfig(),
                 ...this._getAssetApiConfig(),
                 ...this._getBalanceApiConfig(),
                 ...this._getExchangeApiConfig(),
@@ -35,6 +38,47 @@ class Connector extends BasicConnector {
                 validationTypes: this._getCustomValidationTypes(),
             },
         });
+    }
+
+    _getNodeApiConfig() {
+        return {
+            'node.getInfo': {
+                inherits: ['service'],
+                handler: this._node.getInfo,
+                scope: this._node,
+                validation: {},
+            },
+            'node.getKnownNodes': {
+                inherits: ['service'],
+                handler: this._node.getKnownNodes,
+                scope: this._node,
+                validation: {},
+            },
+            'admin.node.setInfo': {
+                inherits: ['adminOnly', 'service'],
+                handler: this._node.setInfo,
+                scope: this._node,
+                validation: {
+                    // TODO -
+                },
+            },
+            'admin.node.setKnownNodes': {
+                inherits: ['adminOnly', 'service'],
+                handler: this._node.setKnownNodes,
+                scope: this._node,
+                validation: {
+                    // TODO -
+                },
+            },
+            'admin.node.removeKnownNodes': {
+                inherits: ['adminOnly', 'service'],
+                handler: this._node.removeKnownNodes,
+                scope: this._node,
+                validation: {
+                    // TODO -
+                },
+            },
+        };
     }
 
     _getAssetApiConfig() {
@@ -470,6 +514,7 @@ class Connector extends BasicConnector {
             },
             exchangePair: {
                 validation: {
+                    required: ['what', 'forWhat'],
                     properties: {
                         what: {
                             type: 'object',
@@ -495,30 +540,6 @@ class Connector extends BasicConnector {
                                 assetUniqueId: {
                                     type: 'uid',
                                 },
-                            },
-                        },
-                    },
-                },
-            },
-            exchangeMarketProperties: {
-                validation: {
-                    what: {
-                        type: 'object',
-                        additionalProperties: false,
-                        properties: {
-                            maxTotalAmount: {
-                                type: ['string', 'number'],
-                                maxLength: 128,
-                            },
-                        },
-                    },
-                    forWhat: {
-                        type: 'object',
-                        additionalProperties: false,
-                        properties: {
-                            maxTotalAmount: {
-                                type: ['string', 'number'],
-                                maxLength: 128,
                             },
                         },
                     },
