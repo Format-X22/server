@@ -29,6 +29,8 @@ class Node extends Basic {
         model.links = links || model.links;
         model.logo = logo || model.logo;
 
+        // TODO Log to feed
+
         await model.save();
     }
 
@@ -38,6 +40,8 @@ class Node extends Basic {
 
         model.knownNodes = [...new Set(rawKnown)];
 
+        // TODO Log to feed
+
         await model.save();
     }
 
@@ -45,6 +49,8 @@ class Node extends Basic {
         const model = await this._getModel();
 
         model.knownNodes = model.knownNodes.filter(node => !knownNodes.includes(node));
+
+        // TODO Log to feed
 
         await model.save();
     }

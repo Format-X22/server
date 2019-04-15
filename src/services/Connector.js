@@ -124,20 +124,28 @@ class Connector extends BasicConnector {
                 handler: this._asset.createAsset,
                 scope: this._asset,
                 validation: {
-                    required: ['shortName', 'fullName', 'maxSupply'],
+                    required: ['shortName'],
                     properties: {
                         shortName: {
                             type: 'string',
-                            minLength: 1,
+                            minLength: 3,
                             maxLength: 16,
                         },
                         fullName: {
                             type: 'string',
-                            minLength: 1,
                             maxLength: 256,
                         },
+                        description: {
+                            type: 'string',
+                            maxLength: 2000,
+                        },
+                        decimals: {
+                            type: 'number',
+                            default: 0,
+                        },
                         maxSupply: {
-                            type: ['number', 'string'],
+                            type: 'number',
+                            default: 0,
                         },
                         logo: {
                             type: 'string',
