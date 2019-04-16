@@ -10,6 +10,8 @@ class Exchange extends Basic {
             amount: targetAmount,
         },
     }) {
+        throw { code: 501, message: 'Not implemented' };
+
         // TODO Check asset freeze
         // TODO Check account freeze
         // TODO -
@@ -17,6 +19,8 @@ class Exchange extends Basic {
     }
 
     async take({ exchangeId }) {
+        throw { code: 501, message: 'Not implemented' };
+
         // TODO Check asset freeze
         // TODO Check account freeze
         // TODO -
@@ -24,6 +28,8 @@ class Exchange extends Basic {
     }
 
     async approve({ exchangeId }) {
+        throw { code: 501, message: 'Not implemented' };
+
         // TODO Check asset freeze
         // TODO Check account freeze
         // TODO -
@@ -31,11 +37,15 @@ class Exchange extends Basic {
     }
 
     async cancel({ exchangeId }) {
+        throw { code: 501, message: 'Not implemented' };
+
         // TODO -
         // TODO Log to feed.
     }
 
     async getRequests({ assetTypeId, limit, sequenceKey }) {
+        throw { code: 501, message: 'Not implemented' };
+
         // TODO -
     }
 }
