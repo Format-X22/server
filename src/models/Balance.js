@@ -17,17 +17,21 @@ module.exports = MongoDB.makeModel(
             type: Number,
             default: 0,
         },
+        frozen: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         index: [
             {
-                // Find for user
+                // Find all user balances
                 fields: {
                     accountId: 1,
                 },
             },
             {
-                // Find current
+                // Find one balance
                 fields: {
                     accountId: 1,
                     assetTypeId: 1,

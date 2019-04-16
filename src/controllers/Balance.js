@@ -84,15 +84,38 @@ class Balance extends Basic {
     }
 
     async freezeAccount({ accountId }) {
-        // TODO -
-        // TODO Log to feed.
+        const models = await this._getBalanceModelsForFrozenManipulation(accountId);
+
+        for (const model of models) {
+            model.frozen = true;
+
+            await model.save();
+        }
+
+        // TODO Log to feed
     }
 
     async unfreezeAccount({ accountId }) {
-        // TODO -
-        // TODO Log to feed.
+        const models = await this._getBalanceModelsForFrozenManipulation(accountId);
+
+        for (const model of models) {
+            model.frozen = false;
+
+            await model.save();
+        }
+
+        // TODO Log to feed
     }
 
+    async _getBalanceModelsForFrozenManipulation(accountId) {
+        const models = await BalanceModel.find({ accountId }, { frozen: true });
+
+        if (!models || !models.length) {
+            throw { code: 404, message: 'Account not found' };
+        }
+
+        return models;
+    }
     _checkTarget(accountId, targetAccountId) {
         if (accountId === targetAccountId) {
             throw { code: 400, message: 'accountId == targetAccountId' };

@@ -4,7 +4,8 @@ const env = require('../data/env');
 class Auth {
     verify(data) {
         // TODO -
-        data.service.accountId = 'ID40806df7a8a2eaaffd363bafe5898731df37be4a73b4a6e2bd5964fe107cc607';
+        data.service.accountId =
+            'ID40806df7a8a2eaaffd363bafe5898731df37be4a73b4a6e2bd5964fe107cc607';
 
         return;
 
@@ -33,7 +34,10 @@ class Auth {
 
         return data;
 
-        data.sign = this._signData(data, env.DS_ADMIN_PRIVATE_KEY);
+        data.service = {
+            publicKey: env.DS_ADMIN_PUBLIC_KEY,
+            sign: this._signData(data, env.DS_ADMIN_PRIVATE_KEY),
+        };
 
         return data;
     }
