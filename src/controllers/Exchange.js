@@ -1,5 +1,6 @@
 const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
+const HistoryUtil = require('../utils/History');
 
 class Exchange extends Basic {
     async request({

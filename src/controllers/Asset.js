@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
 const AssetModel = require('../models/Asset');
+const HistoryUtil = require('../utils/History');
 
 class Asset extends Basic {
     async getList({}) {

@@ -298,7 +298,7 @@ class Connector extends BasicConnector {
                             required: ['amount'],
                             properties: {
                                 amount: {
-                                    type: ['string', 'number'],
+                                    type: 'number',
                                     maxLength: 128,
                                 },
                             },
@@ -307,7 +307,7 @@ class Connector extends BasicConnector {
                             required: ['amount'],
                             properties: {
                                 amount: {
-                                    type: ['string', 'number'],
+                                    type: 'number',
                                     maxLength: 128,
                                 },
                             },
@@ -420,7 +420,7 @@ class Connector extends BasicConnector {
                     required: ['transactionId'],
                     properties: {
                         transactionId: {
-                            type: 'numberId',
+                            type: 'uid',
                         },
                     },
                 },
@@ -449,7 +449,7 @@ class Connector extends BasicConnector {
                 validation: {
                     properties: {
                         hookId: {
-                            type: 'numberId',
+                            type: 'uid',
                         },
                     },
                 },
@@ -588,10 +588,6 @@ class Connector extends BasicConnector {
 
     _getCustomValidationTypes() {
         return {
-            numberId: {
-                type: 'integer',
-                minimum: 0,
-            },
             uid: {
                 type: 'string',
                 maxLength: 256,

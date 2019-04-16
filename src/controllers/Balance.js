@@ -2,6 +2,7 @@ const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
 const AssetModel = require('../models/Asset');
 const BalanceModel = require('../models/Balance');
+const HistoryUtil = require('../utils/History');
 
 class Balance extends Basic {
     async get({ service: { accountId } }) {

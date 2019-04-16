@@ -1,6 +1,7 @@
 const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
 const NodeModel = require('../models/Node');
+const HistoryUtil = require('../utils/History');
 
 class Node extends Basic {
     async getInfo() {
