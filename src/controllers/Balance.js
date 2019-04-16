@@ -34,27 +34,43 @@ class Balance extends Basic {
         amount,
         message,
     }) {
-        amount = new BigNum(amount);
+        this._checkTargetAccountDuplicate(accountId, targetAccountId);
 
-        // TODO Check asset freeze
-        // TODO Check account freeze
+        const asset = await AssetModel.findOne(
+            { assetTypeId },
+            { frozen: true, transferable: true, unique: true }
+        );
 
-        this._checkTarget(accountId, targetAccountId);
-        this._checkSendAmount(amount);
-        await this._checkTransferable(assetTypeId);
-        await this._decrementBalance(
-            { accountId, assetTypeId, assetUniqueId },
-            { amount, exchangeId, message }
-        );
-        await this._incrementBalance(
-            { accountId: targetAccountId, assetTypeId, assetUniqueId },
-            { amount, exchangeId, message }
-        );
+        this._checkAssetExists(asset);
+        this._checkAssetFrozen(asset);
+        this._checkTransferable(asset);
+        this._checkUnique(asset, amount);
+
+        const identificationFrom = { accountId, assetTypeId, assetUniqueId };
+        const balanceFrom = await this._getBalanceModelForSend(identificationFrom);
+
+        this._checkBalanceExists(balanceFrom);
+        this._checkBalanceChangeResult(balanceFrom, amount);
+        this._checkBalanceFrozen(balanceFrom);
+
+        const identificationTo = { accountId: targetAccountId, assetTypeId, assetUniqueId };
+        const balanceTo = await this._getBalanceModelForSend(identificationTo, true);
+
+        this._checkBalanceFrozen(balanceTo);
+
+        await this._decrementBalance(balanceFrom, amount);
+        await this._incrementBalance(balanceTo, amount);
+
+        // TODO Log to feed
     }
 
     async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
         const asset = await this._getAssetModelForSupplyManipulation(assetTypeId);
-        const balance = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
+
+        this._checkUnique(asset, amount);
+
+        const identification = { accountId, assetTypeId, assetUniqueId };
+        const balance = await this._getBalanceModelForAmountManipulation(identification);
 
         balance.amount += amount;
         await balance.save();
@@ -67,7 +83,11 @@ class Balance extends Basic {
 
     async decrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
         const asset = await this._getAssetModelForSupplyManipulation(assetTypeId);
-        const balance = await this._getBalanceModel({ accountId, assetTypeId, assetUniqueId });
+
+        this._checkUnique(asset, amount);
+
+        const identification = { accountId, assetTypeId, assetUniqueId };
+        const balance = await this._getBalanceModelForAmountManipulation(identification);
 
         balance.amount -= amount;
 
@@ -116,56 +136,9 @@ class Balance extends Basic {
 
         return models;
     }
-    _checkTarget(accountId, targetAccountId) {
-        if (accountId === targetAccountId) {
-            throw { code: 400, message: 'accountId == targetAccountId' };
-        }
-    }
-
-    _checkSendAmount(amount) {
-        if (amount.lte(0)) {
-            throw { code: 400, message: 'Amount <= 0' };
-        }
-    }
-
-    async _checkTransferable(assetTypeId) {
-        // TODO -
-    }
-
-    async _decrementBalance(query, { amount, exchangeId, message }) {
-        const modelFrom = await BalanceModel.findOne(query);
-
-        if (!modelFrom) {
-            throw { code: 400, message: 'Account without balance' };
-        }
-
-        modelFrom.amount = modelFrom.amount.minus(amount);
-
-        if (modelFrom.amount.lt(0)) {
-            throw { code: 400, message: 'Account amount < 0' };
-        }
-
-        await modelFrom.save();
-
-        // TODO Log to feed.
-    }
-
-    async _incrementBalance(query, { amount, exchangeId, message }) {
-        let modelTo = await BalanceModel.findOne(query);
-
-        if (!modelTo) {
-            modelTo = new BalanceModel(query);
-        }
-
-        modelTo.amount = modelTo.amount.plus(amount);
-
-        await modelTo.save();
-
-        // TODO Log to feed.
-    }
 
     async _getAssetModelForSupplyManipulation(assetTypeId) {
-        const model = await AssetModel.findOne({ assetTypeId }, { maxSupply: true });
+        const model = await AssetModel.findOne({ assetTypeId }, { maxSupply: true, unique: true });
 
         if (!model) {
             throw { code: 404, message: 'Asset not found' };
@@ -174,22 +147,84 @@ class Balance extends Basic {
         return model;
     }
 
-    async _getBalanceModel({ accountId, assetTypeId, assetUniqueId }) {
-        let model = await BalanceModel.findOne({
-            accountId,
-            assetTypeId,
-            assetUniqueId,
-        });
+    async _getBalanceModelForAmountManipulation(identification) {
+        let model = await BalanceModel.findOne(identification, { amount: true });
 
         if (!model) {
-            model = new BalanceModel({
-                accountId,
-                assetTypeId,
-                assetUniqueId,
-            });
+            model = new BalanceModel(identification);
         }
 
         return model;
+    }
+
+    _checkAssetFrozen(asset) {
+        if (asset.frozen) {
+            throw { code: 403, message: 'Asset frozen' };
+        }
+    }
+
+    _checkBalanceFrozen(balance) {
+        if (balance.frozen) {
+            throw { code: 403, message: 'Balance frozen' };
+        }
+    }
+
+    _checkTransferable(asset) {
+        if (!asset.transferable) {
+            throw { code: 403, message: 'Asset not transferable' };
+        }
+    }
+
+    _checkUnique(asset, amount) {
+        if (asset.unique && amount !== 1) {
+            throw { code: 403, message: 'Amount greater then 1 for unique asset item' };
+        }
+    }
+
+    _checkTargetAccountDuplicate(from, to) {
+        if (from === to) {
+            throw { code: 409, message: 'Source account equivalent target account' };
+        }
+    }
+
+    _checkAssetExists(asset) {
+        if (!asset) {
+            throw { code: 404, message: 'Asset not found' };
+        }
+    }
+
+    _checkBalanceExists(balance) {
+        if (!balance) {
+            throw { code: 404, message: 'Balance not found' };
+        }
+    }
+
+    _checkBalanceChangeResult(balance, amount) {
+        if (balance.amount - amount < 0) {
+            throw { code: 406, message: 'Result balance amount < 0' };
+        }
+    }
+
+    async _getBalanceModelForSend(identification, createIfNotExists) {
+        let model = await BalanceModel.findOne(identification, { frozen: true, amount: true });
+
+        if (!model && createIfNotExists) {
+            model = new BalanceModel(identification);
+        }
+
+        return model;
+    }
+
+    async _decrementBalance(balance, amount) {
+        balance.amount -= amount;
+
+        await balance.save();
+    }
+
+    async _incrementBalance(balance, amount) {
+        balance.amount += amount;
+
+        await balance.save();
     }
 }
 

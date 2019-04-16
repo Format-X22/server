@@ -12,6 +12,7 @@ module.exports = MongoDB.makeModel(
         },
         assetUniqueId: {
             type: String,
+            default: '',
         },
         amount: {
             type: Number,

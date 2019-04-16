@@ -505,7 +505,7 @@ class Connector extends BasicConnector {
                                 },
                                 timestamp: {
                                     type: 'integer',
-                                    minValue: 1553000000000,
+                                    minimum: 1553000000000,
                                 },
                             },
                         },
@@ -523,8 +523,8 @@ class Connector extends BasicConnector {
                         limit: {
                             type: 'integer',
                             default: 10,
-                            minValue: 1,
-                            maxValue: env.DS_MAX_HISTORY_LIMIT,
+                            minimum: 1,
+                            maximum: env.DS_MAX_HISTORY_LIMIT,
                         },
                     },
                 },
@@ -541,10 +541,11 @@ class Connector extends BasicConnector {
                         },
                         assetUniqueId: {
                             type: 'uid',
+                            default: '',
                         },
                         amount: {
                             type: 'integer',
-                            minValue: 1,
+                            minimum: 1,
                         },
                     },
                 },
@@ -589,7 +590,7 @@ class Connector extends BasicConnector {
         return {
             numberId: {
                 type: 'integer',
-                minValue: 0,
+                minimum: 0,
             },
             uid: {
                 type: 'string',
