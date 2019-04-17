@@ -76,9 +76,9 @@ class Connector extends BasicConnector {
                     },
                 },
             },
-            'admin.node.setKnownNodes': {
+            'admin.node.addKnownNodes': {
                 inherits: ['adminOnly', 'service'],
-                handler: this._node.setKnownNodes,
+                handler: this._node.addKnownNodes,
                 scope: this._node,
                 validation: {
                     required: ['knownNodes'],
@@ -417,9 +417,9 @@ class Connector extends BasicConnector {
                 handler: this._history.getBy,
                 scope: this._history,
                 validation: {
-                    required: ['transactionId'],
+                    required: ['eventId'],
                     properties: {
-                        transactionId: {
+                        eventId: {
                             type: 'uid',
                         },
                     },

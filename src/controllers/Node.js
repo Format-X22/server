@@ -40,7 +40,7 @@ class Node extends Basic {
         });
     }
 
-    async setKnownNodes({ knownNodes }) {
+    async addKnownNodes({ knownNodes }) {
         const model = await this._getModel();
         const rawKnown = [...model.knownNodes, ...knownNodes];
 
