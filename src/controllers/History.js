@@ -24,7 +24,7 @@ class History extends Basic {
     async getBy({ eventId }) {
         const model = await HistoryModel.findOne(
             { eventId },
-            { __v: false, _id: false },
+            { __v: false, _id: false, updatedAt: false },
             { lean: true }
         );
 

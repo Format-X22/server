@@ -1,7 +1,9 @@
 const uuid = require('uuid');
 const core = require('gls-core-service');
 const Basic = core.controllers.Basic;
+const env = require('../data/env');
 const AssetModel = require('../models/Asset');
+const BalanceModel = require('../models/Balance');
 const HistoryUtil = require('../utils/History');
 
 class Asset extends Basic {
@@ -32,6 +34,10 @@ class Asset extends Basic {
             throw { code: 409, message: 'Duplicated asset short name' };
         }
 
+        if (unique && maxSupply) {
+            throw { code: 409, message: 'Unique with maxSupply not allowed' };
+        }
+
         const assetTypeId = uuid.v4();
 
         await AssetModel.create({
@@ -47,12 +53,17 @@ class Asset extends Basic {
             frozen,
         });
 
+        if (!unique) {
+            await this._createStartAdminBalance(assetTypeId, maxSupply);
+        }
+
         await HistoryUtil.add('asset', 'create', {
             assetTypeId,
             shortName,
             unique,
             transferable,
             frozen,
+            maxSupply,
         });
 
         return {
@@ -100,6 +111,15 @@ class Asset extends Basic {
         }
 
         return model;
+    }
+
+    async _createStartAdminBalance(assetTypeId, amount) {
+        await BalanceModel.create({
+            accountId: env.DS_ADMIN_ACCOUNT_ID,
+            assetTypeId,
+            assetUniqueId: '',
+            amount,
+        });
     }
 }
 
