@@ -2,13 +2,17 @@ const uuid = require('uuid');
 const HistoryModel = require('../models/History');
 
 class History {
-    static async log(eventType, eventName, eventScope) {
+    static async add(eventType, eventName, eventScope) {
+        const eventId = uuid.v4();
+
         await HistoryModel.create({
-            eventId: uuid.v4(),
+            eventId,
             eventType,
             eventName,
             eventScope,
         });
+
+        return eventId;
     }
 }
 

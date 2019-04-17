@@ -47,7 +47,13 @@ class Asset extends Basic {
             frozen,
         });
 
-        // TODO Log to feed
+        await HistoryUtil.add('asset', 'create', {
+            assetTypeId,
+            shortName,
+            unique,
+            transferable,
+            frozen,
+        });
 
         return {
             assetTypeId,
@@ -57,7 +63,9 @@ class Asset extends Basic {
     async destroyAsset({ assetTypeId }) {
         await AssetModel.remove({ assetTypeId });
 
-        // TODO Log to feed
+        await HistoryUtil.add('asset', 'destroy', {
+            assetTypeId,
+        });
     }
 
     async freezeAsset({ assetTypeId }) {
@@ -67,7 +75,9 @@ class Asset extends Basic {
 
         await model.save();
 
-        // TODO Log to feed.
+        await HistoryUtil.add('asset', 'freeze', {
+            assetTypeId,
+        });
     }
 
     async unfreezeAsset({ assetTypeId }) {
@@ -77,7 +87,9 @@ class Asset extends Basic {
 
         await model.save();
 
-        // TODO Log to feed.
+        await HistoryUtil.add('asset', 'unfreeze', {
+            assetTypeId,
+        });
     }
 
     async _tryGetModelForFrozenManipulation(assetTypeId) {

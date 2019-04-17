@@ -30,9 +30,14 @@ class Node extends Basic {
         model.links = links || model.links;
         model.logo = logo || model.logo;
 
-        // TODO Log to feed
-
         await model.save();
+
+        return await HistoryUtil.add('node', 'infoUpdated', {
+            name,
+            description,
+            links,
+            logo,
+        });
     }
 
     async setKnownNodes({ knownNodes }) {
@@ -41,9 +46,11 @@ class Node extends Basic {
 
         model.knownNodes = [...new Set(rawKnown)];
 
-        // TODO Log to feed
-
         await model.save();
+
+        return await HistoryUtil.add('node', 'addKnownNodes', {
+            knownNodes,
+        });
     }
 
     async removeKnownNodes({ knownNodes }) {
@@ -51,9 +58,11 @@ class Node extends Basic {
 
         model.knownNodes = model.knownNodes.filter(node => !knownNodes.includes(node));
 
-        // TODO Log to feed
-
         await model.save();
+
+        return await HistoryUtil.add('node', 'removeKnownNodes', {
+            knownNodes,
+        });
     }
 
     async _getModel() {

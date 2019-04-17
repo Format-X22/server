@@ -25,7 +25,6 @@ class Balance extends Basic {
         };
     }
 
-    // TODO Return transactionId
     async send({
         service: { accountId },
         accountId: targetAccountId,
@@ -62,7 +61,15 @@ class Balance extends Basic {
         await this._decrementBalance(balanceFrom, amount);
         await this._incrementBalance(balanceTo, amount);
 
-        // TODO Log to feed
+        return await HistoryUtil.add('balance', 'send', {
+            accountId,
+            targetAccountId,
+            assetTypeId,
+            assetUniqueId,
+            exchangeId,
+            amount,
+            message,
+        });
     }
 
     async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
@@ -79,7 +86,12 @@ class Balance extends Basic {
         asset.maxSupply += amount;
         await asset.save();
 
-        // TODO Log to feed
+        return await HistoryUtil.add('balance', 'incrementBalance', {
+            accountId,
+            assetTypeId,
+            assetUniqueId,
+            amount,
+        });
     }
 
     async decrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
@@ -101,7 +113,12 @@ class Balance extends Basic {
         asset.maxSupply -= amount;
         await asset.save();
 
-        // TODO Log to feed
+        return await HistoryUtil.add('balance', 'decrementBalance', {
+            accountId,
+            assetTypeId,
+            assetUniqueId,
+            amount,
+        });
     }
 
     async freezeAccount({ accountId }) {
@@ -113,7 +130,9 @@ class Balance extends Basic {
             await model.save();
         }
 
-        // TODO Log to feed
+        return await HistoryUtil.add('balance', 'freeze', {
+            accountId,
+        });
     }
 
     async unfreezeAccount({ accountId }) {
@@ -125,7 +144,9 @@ class Balance extends Basic {
             await model.save();
         }
 
-        // TODO Log to feed
+        return await HistoryUtil.add('balance', 'unfreeze', {
+            accountId,
+        });
     }
 
     async _getBalanceModelsForFrozenManipulation(accountId) {
