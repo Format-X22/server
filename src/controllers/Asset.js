@@ -20,6 +20,7 @@ class Asset extends Basic {
     }
 
     async createAsset({
+        service: { accountId: adminAccountId },
         shortName,
         fullName,
         description,
@@ -57,13 +58,19 @@ class Asset extends Basic {
             await this._createStartAdminBalance(assetTypeId, maxSupply);
         }
 
-        await HistoryUtil.add('asset', 'create', {
-            assetTypeId,
-            shortName,
-            unique,
-            transferable,
-            frozen,
-            maxSupply,
+        await HistoryUtil.add({
+            eventType: 'asset',
+            eventName: 'create',
+            eventScope: {
+                assetTypeId,
+                shortName,
+                unique,
+                transferable,
+                frozen,
+                maxSupply,
+            },
+            affectedAccounts: [adminAccountId],
+            affectedAssets: [assetTypeId],
         });
 
         return {
@@ -71,35 +78,53 @@ class Asset extends Basic {
         };
     }
 
-    async destroyAsset({ assetTypeId }) {
+    async destroyAsset({ service: { accountId: adminAccountId }, assetTypeId }) {
         await AssetModel.remove({ assetTypeId });
 
-        await HistoryUtil.add('asset', 'destroy', {
-            assetTypeId,
+        await HistoryUtil.add({
+            eventType: 'asset',
+            eventName: 'destroy',
+            eventScope: {
+                assetTypeId,
+            },
+            affectedAccounts: [adminAccountId],
+            affectedAssets: [assetTypeId],
         });
     }
 
-    async freezeAsset({ assetTypeId }) {
+    async freezeAsset({ service: { accountId: adminAccountId }, assetTypeId }) {
         const model = await this._tryGetModelForFrozenManipulation(assetTypeId);
 
         model.frozen = true;
 
         await model.save();
 
-        await HistoryUtil.add('asset', 'freeze', {
-            assetTypeId,
+        await HistoryUtil.add({
+            eventType: 'asset',
+            eventName: 'freeze',
+            eventScope: {
+                assetTypeId,
+            },
+            affectedAccounts: [adminAccountId],
+            affectedAssets: [assetTypeId],
         });
     }
 
-    async unfreezeAsset({ assetTypeId }) {
+    async unfreezeAsset({ service: { accountId: adminAccountId }, assetTypeId }) {
         const model = await this._tryGetModelForFrozenManipulation(assetTypeId);
 
         model.frozen = true;
 
         await model.save();
 
-        await HistoryUtil.add('asset', 'unfreeze', {
-            assetTypeId,
+        await HistoryUtil.add({
+            eventType: 'asset',
+            eventName: 'unfreeze',
+            eventScope: {
+                assetTypeId,
+            },
+            affectedAccounts: [adminAccountId],
+            affectedAssets: [assetTypeId],
         });
     }
 

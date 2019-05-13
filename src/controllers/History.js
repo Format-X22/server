@@ -3,22 +3,46 @@ const Basic = core.controllers.Basic;
 const HistoryModel = require('../models/History');
 
 class History extends Basic {
-    async get({ sequenceKey, limit }) {
-        throw { code: 501, message: 'Not implemented' };
+    async get({ sequenceKey, limit, assetTypeId, accountId }) {
+        const query = {};
+        const projection = {
+            _id: false,
+            __v: false,
+            updatedAt: false,
+            affectedAccounts: false,
+            affectedAssets: false,
+        };
+        const options = { limit, lean: true, sort: { createdAt: -1 } };
 
-        // TODO -
+        if (sequenceKey) {
+            query.createdAt = { $lt: sequenceKey };
+        }
+
+        if (assetTypeId) {
+            query.affectedAssets = assetTypeId;
+        }
+
+        if (accountId) {
+            query.affectedAccounts = accountId;
+        }
+
+        const items = await HistoryModel.find(query, projection, options);
+
+        if (!items) {
+            return this._makeEmptyResult();
+        }
+
+        if (items.length < limit) {
+            return this._makeFinalResult(items);
+        }
+
+        const resultSequenceKey = this._makeSequenceKey(items);
+
+        return this._makeFullResult(items, resultSequenceKey);
     }
 
-    async getFor({ accountId, assetTypeId, sequenceKey, limit }) {
-        throw { code: 501, message: 'Not implemented' };
-
-        // TODO -
-    }
-
-    async getForAll({ assetTypeId, sequenceKey, limit }) {
-        throw { code: 501, message: 'Not implemented' };
-
-        // TODO -
+    async getPersonal({ service, ...args }) {
+        return await this.get({ service, ...args, accountId: service.accountId });
     }
 
     async getBy({ eventId }) {
@@ -35,16 +59,25 @@ class History extends Basic {
         return model;
     }
 
-    async addHook({ url, assetTypeId }) {
-        throw { code: 501, message: 'Not implemented' };
+    _makeSequenceKey(items) {
+        const lastCreatedAt = items[items.length - 1].createdAt;
 
-        // TODO -
+        return Number(lastCreatedAt);
     }
 
-    async removeHook({ hookId }) {
-        throw { code: 501, message: 'Not implemented' };
+    _makeEmptyResult() {
+        return this._makeFullResult([], null);
+    }
 
-        // TODO -
+    _makeFinalResult(items) {
+        return this._makeFullResult(items, null);
+    }
+
+    _makeFullResult(items, sequenceKey) {
+        return {
+            items,
+            sequenceKey,
+        };
     }
 }
 

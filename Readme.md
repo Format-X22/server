@@ -6,7 +6,6 @@ TODO:
 
 Basic:
 
--   Implement history
 -   Implement exchange
 -   Implement identity
 -   Turn on auth
@@ -15,6 +14,7 @@ Extra:
 
 -   Anonymous mode
 -   Models validation
+-   StatsD
 
 First cases:
 

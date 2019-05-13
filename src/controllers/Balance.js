@@ -61,18 +61,30 @@ class Balance extends Basic {
         await this._decrementBalance(balanceFrom, amount);
         await this._incrementBalance(balanceTo, amount);
 
-        return await HistoryUtil.add('balance', 'send', {
-            accountId,
-            targetAccountId,
-            assetTypeId,
-            assetUniqueId,
-            exchangeId,
-            amount,
-            message,
+        return await HistoryUtil.add({
+            eventType: 'balance',
+            eventName: 'send',
+            eventScope: {
+                accountId,
+                targetAccountId,
+                assetTypeId,
+                assetUniqueId,
+                exchangeId,
+                amount,
+                message,
+            },
+            affectedAccounts: [accountId, targetAccountId],
+            affectedAssets: [assetTypeId],
         });
     }
 
-    async incrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
+    async incrementBalance({
+        service: { accountId: adminAccountId },
+        accountId,
+        assetTypeId,
+        assetUniqueId,
+        amount,
+    }) {
         const asset = await this._getAssetModelForSupplyManipulation(assetTypeId);
 
         this._checkUnique(asset, amount);
@@ -86,15 +98,27 @@ class Balance extends Basic {
         asset.maxSupply += amount;
         await asset.save();
 
-        return await HistoryUtil.add('balance', 'incrementBalance', {
-            accountId,
-            assetTypeId,
-            assetUniqueId,
-            amount,
+        return await HistoryUtil.add({
+            eventType: 'balance',
+            eventName: 'incrementBalance',
+            eventScope: {
+                accountId,
+                assetTypeId,
+                assetUniqueId,
+                amount,
+            },
+            affectedAccounts: [adminAccountId, accountId],
+            affectedAssets: [assetTypeId],
         });
     }
 
-    async decrementBalance({ accountId, assetTypeId, assetUniqueId, amount }) {
+    async decrementBalance({
+        service: { accountId: adminAccountId },
+        accountId,
+        assetTypeId,
+        assetUniqueId,
+        amount,
+    }) {
         const asset = await this._getAssetModelForSupplyManipulation(assetTypeId);
 
         this._checkUnique(asset, amount);
@@ -113,15 +137,21 @@ class Balance extends Basic {
         asset.maxSupply -= amount;
         await asset.save();
 
-        return await HistoryUtil.add('balance', 'decrementBalance', {
-            accountId,
-            assetTypeId,
-            assetUniqueId,
-            amount,
+        return await HistoryUtil.add({
+            eventType: 'balance',
+            eventName: 'decrementBalance',
+            eventScope: {
+                accountId,
+                assetTypeId,
+                assetUniqueId,
+                amount,
+            },
+            affectedAccounts: [adminAccountId, accountId],
+            affectedAssets: [assetTypeId],
         });
     }
 
-    async freezeAccount({ accountId }) {
+    async freezeAccount({ service: { accountId: adminAccountId }, accountId }) {
         const models = await this._getBalanceModelsForFrozenManipulation(accountId);
 
         for (const model of models) {
@@ -130,12 +160,17 @@ class Balance extends Basic {
             await model.save();
         }
 
-        return await HistoryUtil.add('balance', 'freeze', {
-            accountId,
+        return await HistoryUtil.add({
+            eventType: 'balance',
+            eventName: 'freeze',
+            eventScope: {
+                accountId,
+            },
+            affectedAccounts: [adminAccountId, accountId],
         });
     }
 
-    async unfreezeAccount({ accountId }) {
+    async unfreezeAccount({ service: { accountId: adminAccountId }, accountId }) {
         const models = await this._getBalanceModelsForFrozenManipulation(accountId);
 
         for (const model of models) {
@@ -144,8 +179,13 @@ class Balance extends Basic {
             await model.save();
         }
 
-        return await HistoryUtil.add('balance', 'unfreeze', {
-            accountId,
+        return await HistoryUtil.add({
+            eventType: 'balance',
+            eventName: 'unfreeze',
+            eventScope: {
+                accountId,
+            },
+            affectedAccounts: [adminAccountId, accountId],
         });
     }
 

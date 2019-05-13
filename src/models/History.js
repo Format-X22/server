@@ -16,6 +16,12 @@ module.exports = MongoDB.makeModel(
         eventScope: {
             type: Object,
         },
+        affectedAssets: {
+            type: [String],
+        },
+        affectedAccounts: {
+            type: [String],
+        },
     },
     {
         index: [

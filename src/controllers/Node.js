@@ -22,7 +22,7 @@ class Node extends Basic {
         };
     }
 
-    async setInfo({ name, description, links, logo }) {
+    async setInfo({ service: { accountId: adminAccountId }, name, description, links, logo }) {
         const model = await this._getModel();
 
         model.name = name || model.name;
@@ -32,15 +32,20 @@ class Node extends Basic {
 
         await model.save();
 
-        return await HistoryUtil.add('node', 'infoUpdated', {
-            name,
-            description,
-            links,
-            logo,
+        return await HistoryUtil.add({
+            eventType: 'node',
+            eventName: 'infoUpdated',
+            eventScope: {
+                name,
+                description,
+                links,
+                logo,
+            },
+            affectedAccounts: [adminAccountId],
         });
     }
 
-    async addKnownNodes({ knownNodes }) {
+    async addKnownNodes({ service: { accountId: adminAccountId }, knownNodes }) {
         const model = await this._getModel();
         const rawKnown = [...model.knownNodes, ...knownNodes];
 
@@ -48,20 +53,30 @@ class Node extends Basic {
 
         await model.save();
 
-        return await HistoryUtil.add('node', 'addKnownNodes', {
-            knownNodes,
+        return await HistoryUtil.add({
+            eventType: 'node',
+            eventName: 'addKnownNodes',
+            eventScope: {
+                knownNodes,
+            },
+            affectedAccounts: [adminAccountId],
         });
     }
 
-    async removeKnownNodes({ knownNodes }) {
+    async removeKnownNodes({ service: { accountId: adminAccountId }, knownNodes }) {
         const model = await this._getModel();
 
         model.knownNodes = model.knownNodes.filter(node => !knownNodes.includes(node));
 
         await model.save();
 
-        return await HistoryUtil.add('node', 'removeKnownNodes', {
-            knownNodes,
+        return await HistoryUtil.add({
+            eventType: 'node',
+            eventName: 'removeKnownNodes',
+            eventScope: {
+                knownNodes,
+            },
+            affectedAccounts: [adminAccountId],
         });
     }
 

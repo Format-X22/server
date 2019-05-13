@@ -381,30 +381,18 @@ class Connector extends BasicConnector {
                         assetTypeId: {
                             type: 'uid',
                         },
-                    },
-                },
-            },
-            'history.getFor': {
-                inherits: ['service', 'sequence'],
-                handler: this._history.getFor,
-                scope: this._history,
-                validation: {
-                    required: ['accountId'],
-                    properties: {
                         accountId: {
                             type: 'accountId',
                         },
-                        assetTypeId: {
-                            type: 'uid',
-                        },
                     },
                 },
             },
-            'history.getForAll': {
+            'history.getPersonal': {
                 inherits: ['service', 'sequence'],
-                handler: this._history.getForAll,
+                handler: this._history.getPersonal,
                 scope: this._history,
                 validation: {
+                    required: [],
                     properties: {
                         assetTypeId: {
                             type: 'uid',
@@ -420,35 +408,6 @@ class Connector extends BasicConnector {
                     required: ['eventId'],
                     properties: {
                         eventId: {
-                            type: 'uid',
-                        },
-                    },
-                },
-            },
-            'admin.history.addHook': {
-                inherits: ['service'],
-                handler: this._history.addHook,
-                scope: this._history,
-                validation: {
-                    required: ['url'],
-                    properties: {
-                        url: {
-                            type: 'string',
-                            maxLength: 2048,
-                        },
-                        assetTypeId: {
-                            type: 'uid',
-                        },
-                    },
-                },
-            },
-            'admin.history.removeHook': {
-                inherits: ['service'],
-                handler: this._history.removeHook,
-                scope: this._history,
-                validation: {
-                    properties: {
-                        hookId: {
                             type: 'uid',
                         },
                     },
@@ -516,7 +475,7 @@ class Connector extends BasicConnector {
                 validation: {
                     properties: {
                         sequenceKey: {
-                            type: ['string', 'null'],
+                            type: ['string', 'number', 'null'],
                             default: null,
                             maxLength: 256,
                         },
