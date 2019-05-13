@@ -4,24 +4,20 @@
 
 TODO:
 
-Basic:
+Сейчас:
 
--   Implement exchange
--   Implement identity
--   Turn on auth
+-   Имплементация обменов
+-   Обмены только с нодами из списка известных
+-   Имплементация identity
+-   Включить авторизацию
+-   Абстрактный плагин обмена
+-   Интеграция с Bitcoin
+-   Интеграция с Ethereum
+-   Форк ядра
 
-Extra:
+На будущее:
 
--   Anonymous mode
--   Models validation
--   StatsD
-
-First cases:
-
--   Plugin system
--   Bitcoin exchange plugin
--   Ethereum exchange plugin
-
-Encapsulation:
-
--   Core framework fork
+-   Хуки истории
+-   Анонимный режим
+-   Валидация на уровне моделей
+-   Обложить StatsD
