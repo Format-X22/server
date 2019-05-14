@@ -7,9 +7,10 @@ const History = require('../controllers/History');
 const Asset = require('../controllers/Asset');
 const Node = require('../controllers/Node');
 const Auth = require('../utils/Auth');
+const Identity = require('../utils/Identity');
 
 class Connector extends BasicConnector {
-    constructor({ identityService }) {
+    constructor() {
         super();
 
         const linking = { connector: this };
@@ -20,8 +21,8 @@ class Connector extends BasicConnector {
         this._asset = new Asset(linking);
         this._node = new Node(linking);
 
-        this._identity = identityService;
         this._auth = new Auth();
+        this._identity = new Identity();
     }
 
     async start() {
